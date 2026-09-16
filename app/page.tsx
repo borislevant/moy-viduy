@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
+import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { viduiItems } from './vidui-data';
 
@@ -214,15 +216,15 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <header className="site-header border-b border-navy-100 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-4 py-4 sm:px-8">
-          <button type="button" className="flex items-center gap-3 text-left" onClick={() => setView('work')}>
-            <span className="grid size-10 place-items-center rounded-full bg-primary text-primary-foreground">
-              <BookOpen className="size-5" aria-hidden="true" />
+      <header className="site-header sticky top-0 z-50 border-b border-navy-100 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-3 py-3 sm:px-8 sm:py-4">
+          <button type="button" className="flex min-w-0 items-center gap-2.5 text-left sm:gap-3" onClick={() => setView('work')}>
+            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground sm:size-10">
+              <BookOpen className="size-4.5 sm:size-5" aria-hidden="true" />
             </span>
-            <span>
-              <span className="block font-serif text-xl font-semibold leading-none">Мой видуй</span>
-              <span className="mt-1 block text-sm text-muted-foreground">Подготовка к Йом-Кипуру</span>
+            <span className="min-w-0">
+              <span className="block truncate font-serif text-lg font-semibold leading-none sm:text-xl">Мой видуй</span>
+              <span className="mt-1 block truncate text-xs text-muted-foreground sm:text-sm">Подготовка к Йом-Кипуру</span>
             </span>
           </button>
           <div className="flex items-center gap-3">
@@ -239,7 +241,29 @@ export default function Home() {
 
       {view === 'work' ? (
         <div className="mx-auto grid max-w-[1400px] gap-0 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <aside className="border-b border-navy-100 bg-white px-4 py-5 lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
+          <aside className="sticky top-[61px] z-40 border-b border-navy-100 bg-white/95 px-3 py-3 shadow-sm backdrop-blur sm:top-[73px] sm:px-5 lg:hidden">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-primary">Часть {active + 1} из 24</p>
+                <p className="text-xs text-muted-foreground">{completed} заполнено</p>
+              </div>
+              <span lang="he" dir="rtl" className="font-hebrew text-2xl font-semibold text-primary">{current.hebrew}</span>
+            </div>
+            <Progress
+              value={((active + 1) / 24) * 100}
+              aria-label={`Часть ${active + 1} из 24`}
+              className="mt-2.5 gap-0 [&_[data-slot=progress-indicator]]:bg-gold [&_[data-slot=progress-track]]:h-1.5"
+            />
+            <NativeSelect className="mt-3 w-full [&_[data-slot=native-select]]:h-11 [&_[data-slot=native-select]]:text-base" value={String(active)} onChange={(event) => goTo(Number(event.target.value))} aria-label="Выберите часть видуя">
+              {viduiItems.map((item, index) => (
+                <NativeSelectOption key={item.id} value={String(index)}>
+                  {index + 1}. {item.translit} — {item.translation}{hasContent(notes[item.id]) ? ' ✓' : ''}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+          </aside>
+
+          <aside className="hidden border-r border-navy-100 bg-white px-6 py-8 lg:sticky lg:top-[73px] lg:block lg:h-[calc(100vh-73px)]">
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.15em] text-teal-700">Короткий видуй</p>
@@ -247,10 +271,12 @@ export default function Home() {
               </div>
               <span className="font-serif text-2xl text-primary">{String(active + 1).padStart(2, '0')}</span>
             </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-navy-50">
-              <div className="h-full rounded-full bg-gold transition-all" style={{ width: `${((active + 1) / 24) * 100}%` }} />
-            </div>
-            <nav aria-label="Части видуя" className="mt-5 flex gap-2 overflow-x-auto pb-2 lg:max-h-[calc(100vh-150px)] lg:grid lg:overflow-y-auto lg:pr-1">
+            <Progress
+              value={((active + 1) / 24) * 100}
+              aria-label={`Часть ${active + 1} из 24`}
+              className="gap-0 [&_[data-slot=progress-indicator]]:bg-gold [&_[data-slot=progress-track]]:h-1.5"
+            />
+            <nav aria-label="Части видуя" className="mt-5 grid max-h-[calc(100vh-150px)] gap-2 overflow-y-auto pr-1">
               {viduiItems.map((item, index) => {
                 const itemHasContent = hasContent(notes[item.id]);
                 return (
@@ -259,7 +285,7 @@ export default function Home() {
                     type="button"
                     onClick={() => goTo(index)}
                     aria-current={active === index ? 'step' : undefined}
-                    className={`group flex min-w-48 items-center gap-3 rounded-xl px-3 py-2.5 text-left transition lg:min-w-0 ${
+                    className={`group flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left transition ${
                       active === index ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-navy-50'
                     }`}
                   >
@@ -276,28 +302,28 @@ export default function Home() {
             </nav>
           </aside>
 
-          <section className="px-4 py-7 sm:px-8 lg:px-12 lg:py-10">
+          <section className="px-3 pb-28 pt-5 sm:px-8 sm:pt-7 lg:px-12 lg:py-10">
             <div className="mx-auto max-w-4xl">
-              <div className="mb-7 flex items-start justify-between gap-5">
+              <div className="mb-5 flex items-start justify-between gap-4 sm:mb-7 sm:gap-5">
                 <div>
-                  <p className="mb-3 text-sm font-semibold text-teal-700">{active + 1} / 24</p>
-                  <div className="flex flex-wrap items-end gap-x-5 gap-y-1">
-                    <h1 lang="he" dir="rtl" className="font-hebrew text-5xl font-semibold leading-none text-primary sm:text-6xl">{current.hebrew}</h1>
-                    <p className="font-serif text-2xl text-navy-700">{current.translit}</p>
+                  <p className="mb-2 hidden text-sm font-semibold text-teal-700 lg:block">{active + 1} / 24</p>
+                  <div className="flex flex-wrap items-end gap-x-4 gap-y-1 sm:gap-x-5">
+                    <h1 lang="he" dir="rtl" className="font-hebrew text-4xl font-semibold leading-none text-primary sm:text-6xl">{current.hebrew}</h1>
+                    <p className="font-serif text-xl text-navy-700 sm:text-2xl">{current.translit}</p>
                   </div>
-                  <p className="mt-3 text-xl font-semibold">{current.translation}</p>
+                  <p className="mt-2 text-lg font-semibold sm:mt-3 sm:text-xl">{current.translation}</p>
                 </div>
                 <span className="hidden rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-amber-900 sm:block">по материалам Толдот</span>
               </div>
 
               <div className="grid gap-5 xl:grid-cols-[1.05fr_.95fr]">
                 <div className="space-y-5">
-                  <article className="paper-card p-6">
+                  <article className="paper-card p-4 sm:p-6">
                     <p className="section-label">Краткий смысл</p>
                     <p className="mt-3 text-[1.05rem] leading-7 text-navy-900">{current.explanation}</p>
                   </article>
 
-                  <article className="paper-card p-6">
+                  <article className="paper-card p-4 sm:p-6">
                     <p className="section-label">О чём подумать</p>
                     <p className="mt-1 text-sm text-muted-foreground">Отметьте мысли, которые помогают вашей каване.</p>
                     <div className="mt-5 space-y-3">
@@ -311,7 +337,7 @@ export default function Home() {
                   </article>
                 </div>
 
-                <article className="paper-card p-6">
+                <article className="paper-card p-4 sm:p-6">
                   <p className="section-label">Моя личная конкретизация</p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">Выберите только то, что относится к вам, или напишите своими словами.</p>
                   <div className="mt-5 space-y-3">
@@ -327,7 +353,7 @@ export default function Home() {
                     <Textarea
                       value={entry.custom}
                       onChange={(event) => update({ custom: event.target.value })}
-                      className="mt-2 min-h-32 resize-y bg-white"
+                      className="mt-2 min-h-28 resize-y bg-white text-base sm:min-h-32"
                       placeholder="Я хочу признать, что…"
                     />
                   </label>
@@ -335,7 +361,7 @@ export default function Home() {
                 </article>
               </div>
 
-              <div className="mt-7 flex items-center justify-between gap-3">
+              <div className="mt-7 hidden items-center justify-between gap-3 lg:flex">
                 <Button variant="outline" disabled={active === 0} onClick={() => goTo(active - 1)}>
                   <ArrowLeft className="size-4" /> Назад
                 </Button>
@@ -353,6 +379,24 @@ export default function Home() {
               <Sources compact />
             </div>
           </section>
+
+          <div className="print-hidden fixed inset-x-0 bottom-0 z-50 border-t border-navy-100 bg-white/95 px-3 py-2.5 shadow-[0_-10px_30px_rgba(23,42,69,0.08)] backdrop-blur lg:hidden">
+            <div className="mx-auto grid max-w-lg grid-cols-[1fr_auto_1fr] items-center gap-2">
+              <Button variant="outline" className="min-h-11 justify-self-stretch" disabled={active === 0} onClick={() => goTo(active - 1)}>
+                <ArrowLeft className="size-4" /> Назад
+              </Button>
+              <span className="min-w-12 text-center text-sm font-semibold tabular-nums text-muted-foreground">{active + 1}/24</span>
+              {active === viduiItems.length - 1 ? (
+                <Button className="min-h-11 justify-self-stretch" onClick={() => setView('summary')}>
+                  Итог <FileText className="size-4" />
+                </Button>
+              ) : (
+                <Button className="min-h-11 justify-self-stretch" onClick={() => goTo(active + 1)}>
+                  Дальше <ArrowRight className="size-4" />
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       ) : (
         <Summary
@@ -387,20 +431,20 @@ function Summary({
   onDownload: () => void;
 }) {
   return (
-    <section className="summary-page mx-auto max-w-4xl px-4 py-8 sm:px-8 sm:py-12">
-      <div className="print-hidden mb-8 flex flex-wrap items-center justify-between gap-4">
-        <Button variant="outline" onClick={onBack}><ArrowLeft className="size-4" /> Вернуться к частям</Button>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={onCopy}><Clipboard className="size-4" /> {message || 'Копировать'}</Button>
-          <Button variant="outline" onClick={onDownload}><Download className="size-4" /> Скачать текст</Button>
-          <Button onClick={() => window.print()}><Printer className="size-4" /> Печать / PDF</Button>
+    <section className="summary-page mx-auto max-w-4xl px-3 py-5 sm:px-8 sm:py-12">
+      <div className="print-hidden mb-5 grid gap-3 sm:mb-8 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
+        <Button variant="outline" className="min-h-11 w-full sm:w-auto" onClick={onBack}><ArrowLeft className="size-4" /> Вернуться к частям</Button>
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+          <Button variant="outline" className="min-h-11" onClick={onCopy}><Clipboard className="size-4" /> {message || 'Копировать'}</Button>
+          <Button variant="outline" className="min-h-11" onClick={onDownload}><Download className="size-4" /> Скачать</Button>
+          <Button className="col-span-2 min-h-11" onClick={() => window.print()}><Printer className="size-4" /> Печать / PDF</Button>
         </div>
       </div>
 
-      <div className="document-sheet rounded-2xl border border-navy-100 bg-white px-5 py-9 shadow-[0_18px_50px_rgba(23,42,69,0.08)] sm:px-12 sm:py-12">
-        <div className="border-b border-navy-100 pb-8 text-center">
+      <div className="document-sheet rounded-2xl border border-navy-100 bg-white px-4 py-7 shadow-[0_18px_50px_rgba(23,42,69,0.08)] sm:px-12 sm:py-12">
+        <div className="border-b border-navy-100 pb-6 text-center sm:pb-8">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">Личная подготовка к Йом-Кипуру</p>
-          <h1 className="mt-3 font-serif text-4xl font-semibold text-primary">Мой видуй</h1>
+          <h1 className="mt-3 font-serif text-3xl font-semibold text-primary sm:text-4xl">Мой видуй</h1>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground">Здесь собраны только выбранные вами направления мысли и личные формулировки. Произносите лишь то, что правдиво и относится к вам.</p>
         </div>
 
