@@ -15,7 +15,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
-import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { viduiItems } from './vidui-data';
 
@@ -249,11 +248,7 @@ export default function Home() {
               </div>
               <span lang="he" dir="rtl" className="font-hebrew text-2xl font-semibold text-primary">{current.hebrew}</span>
             </div>
-            <Progress
-              value={((active + 1) / 24) * 100}
-              aria-label={`Часть ${active + 1} из 24`}
-              className="mt-2.5 gap-0 [&_[data-slot=progress-indicator]]:bg-gold [&_[data-slot=progress-track]]:h-1.5"
-            />
+            <ViduiProgress current={active + 1} className="mt-2.5" />
             <NativeSelect className="mt-3 w-full [&_[data-slot=native-select]]:h-11 [&_[data-slot=native-select]]:text-base" value={String(active)} onChange={(event) => goTo(Number(event.target.value))} aria-label="Выберите часть видуя">
               {viduiItems.map((item, index) => (
                 <NativeSelectOption key={item.id} value={String(index)}>
@@ -271,11 +266,7 @@ export default function Home() {
               </div>
               <span className="font-serif text-2xl text-primary">{String(active + 1).padStart(2, '0')}</span>
             </div>
-            <Progress
-              value={((active + 1) / 24) * 100}
-              aria-label={`Часть ${active + 1} из 24`}
-              className="gap-0 [&_[data-slot=progress-indicator]]:bg-gold [&_[data-slot=progress-track]]:h-1.5"
-            />
+            <ViduiProgress current={active + 1} />
             <nav aria-label="Части видуя" className="mt-5 grid max-h-[calc(100vh-150px)] gap-2 overflow-y-auto pr-1">
               {viduiItems.map((item, index) => {
                 const itemHasContent = hasContent(notes[item.id]);
@@ -410,6 +401,21 @@ export default function Home() {
         />
       )}
     </main>
+  );
+}
+
+function ViduiProgress({ current, className = '' }: { current: number; className?: string }) {
+  return (
+    <div
+      role="progressbar"
+      aria-label={`Часть ${current} из 24`}
+      aria-valuemin={1}
+      aria-valuemax={24}
+      aria-valuenow={current}
+      className={`h-1.5 overflow-hidden rounded-full bg-navy-50 ${className}`}
+    >
+      <span className="block h-full rounded-full bg-gold transition-[width]" style={{ width: `${(current / 24) * 100}%` }} />
+    </div>
   );
 }
 
