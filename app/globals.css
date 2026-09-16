@@ -1,0 +1,86 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-navy-50: #eef2f7;
+  --color-navy-100: #d8e0ea;
+  --color-navy-200: #bac7d7;
+  --color-navy-700: #334b68;
+  --color-navy-900: #172a45;
+  --color-gold: #c59636;
+  --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-source-serif);
+  --font-hebrew: var(--font-noto-hebrew);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+:root {
+  --background: #f6f8fb;
+  --foreground: #172a45;
+  --card: #ffffff;
+  --card-foreground: #172a45;
+  --primary: #173b5f;
+  --primary-foreground: #ffffff;
+  --secondary: #e8eef4;
+  --secondary-foreground: #173b5f;
+  --muted: #edf1f5;
+  --muted-foreground: #66768a;
+  --accent: #e2f2ee;
+  --accent-foreground: #155e59;
+  --destructive: #b42318;
+  --border: #d8e0ea;
+  --input: #c9d3df;
+  --ring: #2f7d76;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  html { @apply font-sans; }
+  body { @apply bg-background text-foreground; }
+  button, label { -webkit-tap-highlight-color: transparent; }
+}
+
+@layer components {
+  .paper-card {
+    @apply rounded-2xl border border-navy-100 bg-white shadow-[0_12px_34px_rgba(23,42,69,0.06)];
+  }
+  .section-label {
+    @apply text-xs font-bold uppercase tracking-[0.14em] text-teal-700;
+  }
+  .choice-row {
+    @apply flex cursor-pointer items-center gap-3 rounded-xl border border-navy-100 bg-navy-50/45 px-4 py-3.5 text-[0.95rem] leading-6 transition hover:border-teal-600/40 hover:bg-teal-50;
+  }
+}
+
+@media print {
+  @page { margin: 16mm; }
+  header, aside, button, .print-hidden { display: none !important; }
+  html, body, main, section { background: white !important; }
+  .summary-page { max-width: none !important; padding: 0 !important; }
+  .document-sheet { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; padding: 0 !important; }
+  .summary-entry { break-inside: avoid; }
+  .print-links a { color: #334b68 !important; text-decoration: none !important; }
+}
